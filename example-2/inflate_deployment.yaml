@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example4-inflate
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: example4-inflate
+  template:
+    metadata:
+      labels:
+        app: example4-inflate
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: custom-label
+                    operator: In
+                    values:
+                      - hello
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: inflate
+          image: public.ecr.aws/eks-distro/kubernetes/pause:3.7
+          resources:
+            requests:
+              cpu: "1"

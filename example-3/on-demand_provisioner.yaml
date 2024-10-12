@@ -1,0 +1,35 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: on-demand
+spec:
+  template:
+    spec:
+      requirements:
+        - key: "karpenter.sh/capacity-type"
+          operator: In
+          values: ["on-demand"]
+        - key: node.kubernetes.io/instance-type
+          operator: In
+          values:
+            - r5n.large
+            - r5.large
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: on-demand
+---
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: on-demand
+spec:
+  role: "karpenter-project-hama"
+  amiSelectorTerms:
+    - alias: al2@latest
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "project-hama"
+  securityGroupSelectorTerms:
+    - tags:
+        aws:eks:cluster-name: "project-hama"
